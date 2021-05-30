@@ -1,0 +1,16 @@
+name: Hello
+
+on:
+  push:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    runs-one: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Say hello
+      run: echo Hello, world!
