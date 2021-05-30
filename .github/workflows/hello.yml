@@ -11,6 +11,7 @@ jobs:
   build:
     runs-one: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: checkout code
+        uses: actions/checkout@v2
       - name: Say hello
-      run: echo Hello, world!
+        run: echo Hello, world!
