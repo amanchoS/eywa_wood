@@ -1,4 +1,5 @@
 import express from 'express';
+import client from './db.js';
 import tasksRouter from './tasks.js';
 
 const app = express();
@@ -12,7 +13,12 @@ app.get('/', (request, response) => {
 app.use('/api/tasks', tasksRouter);
 
 
-app.listen(4000, () => {
+app.listen(4000, async () => {
     console.log('Server is ready to use');
+
+    await client.connect();
+    console.log('Database is ready to use');
+
+
 });
 
