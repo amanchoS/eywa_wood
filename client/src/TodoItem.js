@@ -1,4 +1,4 @@
-function TodoItem({ title, isCompleted }) {
+function TodoItem({ title, isCompleted, onCompleted, onDelete }) {
   return (
     <div 
       className="todo-item"
@@ -7,8 +7,8 @@ function TodoItem({ title, isCompleted }) {
       }}>
       {title}
       <div>
-        <button>Done</button>
-        <button>Delete</button>
+        <button onClick={onCompleted}>Done</button>
+        <button onClick={onDelete}>Delete</button>
       </div>
     </div>
   );
