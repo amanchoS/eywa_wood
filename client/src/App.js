@@ -1,67 +1,76 @@
 import {useState, useEffect } from 'react';
 import TodoItem from './TodoItem.js';
 import TodoForm from './TodoForm.js';
-
-
-const getTasks = () => {
-  return fetch('http://localhost:4000/api/tasks').then((response) => 
-    response.json(),
-  );
-  
-};
-
+import * as api from './api';
 
 function App() {
   const [tasks, setTasks] = useState([]);
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  
+  const fetchTasks = () => api.getTasks().then(setTasks);
+  
   useEffect(() => {
-    getTasks().then((data) => setTasks(data));
+    setLoading(true);
+    fetchTasks()
+      .catch(setError)
+      .finally(() => {
+        setLoading(false);
+
+      });
   }, []);
 
 
   const setCompleted = (id, isCompleted) => {
-    fetch(`http://localhost:4000/api/tasks/${id}`, {
-      method: 'put',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        isCompleted,
-      }),
-    })
-    .then(() => {
-      getTasks().then((data) => setTasks(data));
-    })
-    .catch((err) => console.error(err));
+    setLoading(true);
+    api
+      .setCompletedTask(id, isCompleted)
+      .then(() => fetchTasks())
+      .catch(setError)
+      .finally(() => {
+        setLoading(false);
+
+      });
   };
 
   const deleteTask = (id) => {
-
-    fetch(`http://localhost:4000/api/tasks/${id}`, {
-      method: 'delete',
-    })
-      .then(() => {
-        getTasks().then((data) => setTasks(data));
-      })
-      .catch((err) => console.error(err));
+    setLoading(true);
+    api
+    .deleteTask(id)
+    .then(() => fetchTasks())
+    .catch(setError)
+    .finally(() => {
+      setLoading(false);
+    });
   };
 
   const addTask = (title) => {
-    fetch('http://localhost:4000/api/tasks', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title,
-        isCompleted: false,
-      }),
-    })
-    .then(() => {
-      getTasks().then((data) => setTasks(data));
-    })
-    .catch((err) => console.error(err));
+    setLoading(true);
+    api
+    .addTask(title)
+    .then(() => fetchTasks())
+    .catch(setError)
+    .finally(() => {
+      setLoading(false);
+    });
   };
+
+  if (loading) {
+    return (
+      <div className = "app">
+        <h1>Loading...</h1>
+      </div>
+     );
+  }
+  
+  if (error && error.message) {
+    return (
+      <div className = "app">
+        <h1 style = {{ color: 'red' }}>{error.message}</h1>
+      </div>
+     );
+  }
+
 
   return (
     <div className="app">
