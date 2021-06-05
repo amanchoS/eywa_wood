@@ -5,20 +5,7 @@ import {getCollection} from './db.js';
 const router = express.Router();
 
 
-const tasks = [
-    {
-      id: 'ID1',
-      title: 'Clean out the house',
-    },
-    {
-      id: 'ID2',
-      title: 'Take out the trash',
-    },
-    {
-      id: 'ID3',
-      title: 'Learn express.js',
-    },
-  ];
+
 
 router.get('/', async (req,res) => {
     const tasksCollection = getCollection('tasks');
