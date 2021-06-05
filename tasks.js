@@ -1,6 +1,9 @@
 import express from 'express';
+import  mongodb from 'mongodb';
+import {getCollection} from './db.js';
 
 const router = express.Router();
+
 
 const tasks = [
     {
@@ -17,24 +20,33 @@ const tasks = [
     },
   ];
 
-router.get('/', (req,res) => {
-    res.send(tasks);
+router.get('/', async (req,res) => {
+    const tasksCollection = getCollection('tasks');
+    const taskDocs = await tasksCollection.find({}).toArray();
+    res.send(taskDocs);
 });
 
-router.post('/', (req,res) => {
+router.post('/', async (req,res) => {
+    const tasksCollection = getCollection('tasks');
+
 
     const newTask = req.body;
-    
-    tasks.push(newTask);
-
     console.log(newTask);
-
-
-    res.status(201).send('Task added');
+  
+    try {
+      await tasksCollection.insertOne(newTask);
+      res.status(201).send('Task added');
+    } catch (e) {
+      res.status(500).send('Unknown Error');
+    }
 });
 
-router.get('/:id', (req,res) => {
-    const task = tasks.find(task => task.id === req.params.id);
+router.get('/:id', async (req,res) => {
+    const tasksCollection = getCollection('tasks');
+    const taskId = mongodb.ObjectID(req.params.id);
+    
+    const task = await tasksCollection.findOne({ _id: taskId });
+    
 
     if (task) {
         res.send(task);
@@ -44,12 +56,37 @@ router.get('/:id', (req,res) => {
 
 });
 
-router.put('/:id', (req,res) => {
-    res.status(501).send('Not implemented');
+
+router.put('/:id', async (req,res) => {
+  const tasksCollection = getCollection('tasks');
+  const taskID = mongodb.ObjectID(req.params.id);
+  const taskChanges = req.body;
+  console.log(taskChanges);
+
+  const task = await tasksCollection.updateOne(
+    { _id: taskID },
+    { $set: taskChanges},
+  );
+
+  if (task) {
+    res.send('Task was updated');
+  } else {
+     res.status(404).send('Task with this ID not founded');
+  }
 });
 
-router.delete('/:id', (req,res) => {
-    res.status(501).send('Not implemented');
+
+router.delete('/:id', async (req,res) => {
+  const tasksCollection = getCollection('tasks');
+  const taskID = mongodb.ObjectID(req.params.id);
+  const task = await tasksCollection.deleteOne({ _id: taskID });
+
+  if (task) {
+    res.send('Delete request completed');
+  } else {
+     res.status(404).send('Task with this ID not founded');
+  }
+
 });
 
 
