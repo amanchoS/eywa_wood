@@ -56,12 +56,37 @@ router.get('/:id', async (req,res) => {
 
 });
 
-router.put('/:id', (req,res) => {
-    res.status(501).send('Not implemented');
+
+router.put('/:id', async (req,res) => {
+  const tasksCollection = getCollection('tasks');
+  const taskID = mongodb.ObjectID(req.params.id);
+  const taskChanges = req.body;
+  console.log(taskChanges);
+
+  const task = await tasksCollection.updateOne(
+    { _id: taskID },
+    { $set: taskChanges},
+  );
+
+  if (task) {
+    res.send('Task was updated');
+  } else {
+     res.status(404).send('Task with this ID not founded');
+  }
 });
 
-router.delete('/:id', (req,res) => {
-    res.status(501).send('Not implemented');
+
+router.delete('/:id', async (req,res) => {
+  const tasksCollection = getCollection('tasks');
+  const taskID = mongodb.ObjectID(req.params.id);
+  const task = await tasksCollection.deleteOne({ _id: taskID });
+
+  if (task) {
+    res.send('Delete request completed');
+  } else {
+     res.status(404).send('Task with this ID not founded');
+  }
+
 });
 
 

@@ -1,58 +1,66 @@
-import {useState} from 'react';
+import {useState, useEffect } from 'react';
 import TodoItem from './TodoItem.js';
 import TodoForm from './TodoForm.js';
 
 
+const getTasks = () => {
+  return fetch('http://localhost:4000/api/tasks').then((response) => 
+    response.json(),
+  );
+  
+};
+
 
 function App() {
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: 'Task 1',
-      isCompleted: false,
-  
-    },
-  
-    {
-      id: 2,
-      title: 'Task 2',
-      isCompleted: false,
-  
-    },
-  
-    {
-      id: 3,
-      title: 'Task 3',
-      isCompleted: false,
-  
-    },
-  ]);
+  const [tasks, setTasks] = useState([]);
 
-  const setCompleted = (id) => {
-    setTasks(tasks.map(task => {
-      if (task.id !== id) {
-        return task;
-      }
-      return {
-        ...task,
-        isCompleted: !task.isCompleted
-      };
-    }));
+  useEffect(() => {
+    getTasks().then((data) => setTasks(data));
+  }, []);
+
+
+  const setCompleted = (id, isCompleted) => {
+    fetch(`http://localhost:4000/api/tasks/${id}`, {
+      method: 'put',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        isCompleted,
+      }),
+    })
+    .then(() => {
+      getTasks().then((data) => setTasks(data));
+    })
+    .catch((err) => console.error(err));
   };
 
   const deleteTask = (id) => {
-    setTasks(tasks.filter(task => task.id !== id));
+
+    fetch(`http://localhost:4000/api/tasks/${id}`, {
+      method: 'delete',
+    })
+      .then(() => {
+        getTasks().then((data) => setTasks(data));
+      })
+      .catch((err) => console.error(err));
   };
 
   const addTask = (title) => {
-    setTasks([
-      ...tasks,
-      {
-        id: Math.round(Math.random() * 1000),
+    fetch('http://localhost:4000/api/tasks', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         title,
         isCompleted: false,
-      }
-    ]);
+      }),
+    })
+    .then(() => {
+      getTasks().then((data) => setTasks(data));
+    })
+    .catch((err) => console.error(err));
   };
 
   return (
@@ -64,11 +72,11 @@ function App() {
 
         {tasks.map((task) => (
           <TodoItem
-            key={task.id}
+            key={task._id}
             title={task.title}
             isCompleted={task.isCompleted}
-            onCompleted={() => setCompleted(task.id)}
-            onDelete={() => deleteTask(task.id)}
+            onCompleted={() => setCompleted(task._id, !task.isCompleted)}
+            onDelete={() => deleteTask(task._id)}
           />
 
         ))}
