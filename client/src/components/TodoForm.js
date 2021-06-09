@@ -1,4 +1,6 @@
 // TodoForm.js file:
+import TextField from '@material-ui/core/TextField';
+
 function TodoForm({addTask}) {
     const onSubmit = (event) => {
       event.preventDefault();
@@ -10,7 +12,12 @@ function TodoForm({addTask}) {
   
     return (
       <form className="todo-form" onSubmit={onSubmit}>
-        <input name="title" type="text" placeholder="Add new task…" />
+        <TextField 
+          name="title" 
+          label="Add a new task" 
+          variant="outlined"
+          fullWidth
+        />
       </form>
     );
   }

@@ -1,8 +1,9 @@
 import {useState, useEffect } from 'react';
 import TodoItem from './TodoItem.js';
 import TodoForm from './TodoForm.js';
-import * as api from './api';
-
+import * as api from '../api';
+import List from '@material-ui/core/List';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 function TodoList () {
 
@@ -57,13 +58,7 @@ function TodoList () {
       });
     };
   
-    if (loading) {
-      return (
-        <div>
-          <h1>Loading...</h1>
-        </div>
-       );
-    }
+
     
     if (error && error.message) {
       return (
@@ -74,27 +69,30 @@ function TodoList () {
     }
 
     return (
-        <main>
+        <div>
             
             <TodoForm addTask={addTask} />
 
-            <div className="todo-list">   
-
+            {loading ? (
+              <CircularProgress style={{
+                margin: '2em 50%',
+              }}/>
+            ) : (
+              <List>   
                 {tasks.map((task) => (
-                <TodoItem
-                key={task._id}
-                title={task.title}
-                taskID = {task._id}
-                isCompleted={task.isCompleted}
-                onCompleted={() => setCompleted(task._id, !task.isCompleted)}
-                onDelete={() => deleteTask(task._id)}
-                />
-
+                  <TodoItem
+                    key={task._id}
+                    title={task.title}
+                    taskID = {task._id}
+                    isCompleted={task.isCompleted}
+                    onCompleted={() => setCompleted(task._id, !task.isCompleted)}
+                    onDelete={() => deleteTask(task._id)}
+                  />
                 ))}
-            </div>
-        </main>
+              </List>
+            )}
+        </div>
     );
-  
-}
+                }
 
 export default TodoList;

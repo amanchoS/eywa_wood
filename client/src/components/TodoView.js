@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import * as api from './api';
+import * as api from '../api';
 
 
 function TodoView () {
